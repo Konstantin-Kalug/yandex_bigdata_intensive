@@ -20,7 +20,7 @@ def filter_first_2020_2023(line):
 def del_quotation_marks(elems):
     for i in range(len(elems)):
         if '"' in elems[i]:
-            elems[i] = elems[1:-1]
+            elems[i] = elems[i][1:-1]
     return elems
 
 
@@ -58,49 +58,47 @@ def map_2020_2023(elems):
 
 def get_data():
     directory ='sources/'
-    files = None
     # 2013 - 2019
     for i in range(2013, 2020):
-        for filename in os.listdir(directory):
-            if str(i) not in filename:
-                continue
-            file = sc.textFile(os.path.join(directory, filename)) \
-                .map(lambda line: line.split(',')) \
-                .map(del_quotation_marks) \
-                .filter(filter_first_2013_2019)
-            if files is None:
-                files = file
-            else:
-                files = files.union(file)
-    res = files.map(map_2013_2019).filter(lambda x: x != '')
-    res.coalesce(1).saveAsTextFile('clean_sources/2013-2019')
-    files = None
+        files = None
+        try:
+            for filename in os.listdir(directory):
+                if str(i) not in filename:
+                    continue
+                file = sc.textFile(os.path.join(directory, filename)) \
+                    .map(lambda line: line.split(',')) \
+                    .map(del_quotation_marks) \
+                    .filter(filter_first_2013_2019)
+                if files is None:
+                    files = file
+                else:
+                    files = files.union(file)
+            res = files.map(map_2013_2019).filter(lambda x: x != '')
+            res.coalesce(1).saveAsTextFile(f'clean_sources/{i}')
+        except:
+            pass
     # 2020 - 2023
     for i in range(2020, 2024):
-        for filename in os.listdir(directory):
-            if str(i) not in filename:
-                continue
-            file = sc.textFile(os.path.join(directory, filename)) \
-                .map(lambda line: line.split(',')) \
-                .map(del_quotation_marks) \
-                .filter(filter_first_2020_2023)
-            if files is None:
-                files = file
-            else:
-                files = files.union(file)
-    res = files.map(map_2020_2023).filter(lambda x: x != '')
-    res.coalesce(1).saveAsTextFile('clean_sources/2020-2023')
-
-
-def join_data():
-    file1 = sc.textFile('clean_sources/2013-2019/part-00000')
-    file2 = sc.textFile('clean_sources/2020-2023/part-00000')
-    file = file1.union(file2)
-    file.coalesce(1).saveAsTextFile('clean_sources/full')
+        files = None
+        try:
+            for filename in os.listdir(directory):
+                if str(i) not in filename:
+                    continue
+                file = sc.textFile(os.path.join(directory, filename)) \
+                    .map(lambda line: line.split(',')) \
+                    .map(del_quotation_marks) \
+                    .filter(filter_first_2020_2023)
+                if files is None:
+                    files = file
+                else:
+                    files = files.union(file)
+            res = files.map(map_2020_2023).filter(lambda x: x != '')
+            res.coalesce(1).saveAsTextFile(f'clean_sources/{i}')
+        except:
+            pass
 
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName('test').setMaster('local')
     sc = SparkContext(conf=conf)
     get_data()
-    join_data()
