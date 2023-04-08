@@ -31,17 +31,17 @@ def map_2013_2019(elems):
                 return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M").isoformat(),
                                  datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M").isoformat(), elems[-6],
                                  elems[-4], '', '', '', '', elems[-3], elems[-2],
-                                 str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M").year - int(elems[-1])) if elems[-1] else ''])
+                                 str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M").year - int(elems[-1])) if elems[-1] else '', elems[3]])
             else:
                 return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M:%S").isoformat(),
                                  datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M:%S").isoformat(), elems[-6],
                                  elems[-4], '', '', '', '', elems[-3], elems[-2],
-                                 str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M:%S").year - int(elems[-1])) if elems[-1] else ''])
+                                 str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M:%S").year - int(elems[-1])) if elems[-1] else '', elems[3]])
         else:
             return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").isoformat(),
                              datetime.datetime.strptime(elems[2], "%m/%d/%Y %H:%M").isoformat(), elems[-6],
                              elems[-4], '', '', '', '', elems[-3], elems[-2],
-                             str(datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").year - int(elems[-1])) if elems[-1] else ''])
+                             str(datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").year - int(elems[-1])) if elems[-1] else '', elems[3]]),
     except:
         return ''
 
@@ -51,7 +51,7 @@ def map_2020_2023(elems):
         return ','.join([elems[0], elems[1], datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M:%S").isoformat(),
                          datetime.datetime.strptime(elems[3], "%Y-%m-%d %H:%M:%S").isoformat(),
                          elems[4], elems[6], elems[8], elems[9],
-                         elems[10], elems[11], elems[12], '', ''])
+                         elems[10], elems[11], elems[12], '', '', ''])
      except:
          return ''
 
