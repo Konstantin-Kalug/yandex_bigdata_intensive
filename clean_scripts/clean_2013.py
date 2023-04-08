@@ -30,7 +30,7 @@ def parse_trips(line):
             "to_station_name": to_station_name,
             "usertype": usertype,
             "gender": gender,
-            "birthday": birthday
+            "age": datetime.datetime.strptime(starttime, "%Y-%m-%d %H:%M").year - int(birthday) if birthday else ''
         }
 
 def map_trips(line):
@@ -47,12 +47,12 @@ def map_trips(line):
         "to_station_name": trip["to_station_name"],
         "usertype": trip["usertype"],
         "gender": trip["gender"],
-        "birthday": trip["birthday"],
-        "from_latitude": from_station["latitude"] if from_station else None,
-        "from_longitude": from_station["longitude"] if from_station else None,
-        "from_dpcapacity": from_station["dpcapacity"] if from_station else None,
-        "from_landmark": from_station["landmark"] if from_station else None,
-        "from_online_date": from_station["online_date"] if from_station else None
+        "age": trip["age"],
+        "from_latitude": from_station["latitude"],
+        "from_longitude": from_station["longitude"],
+        "from_dpcapacity": from_station["dpcapacity"],
+        "from_landmark": from_station["landmark"],
+        "from_online_date": from_station["online_date"]
     }
 
 def finalise(line):
@@ -66,11 +66,11 @@ def finalise(line):
         trip_from["to_station_name"],
         trip_from["from_latitude"],
         trip_from["from_longitude"],
-        to_station["latitude"] if to_station else None,
-        to_station["longitude"] if to_station else None,
+        to_station["latitude"],
+        to_station["longitude"],
         trip_from["usertype"],
         trip_from["gender"],
-        trip_from["birthday"]
+        trip_from["age"]
     ]])
 
 
