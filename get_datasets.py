@@ -29,18 +29,18 @@ def map_2013_2019(elems):
         if '/' not in elems[1]:
             if len(elems[1].split()[1]) != 8:
                 return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M").isoformat(),
-                                 datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M").isoformat(), elems[6],
-                                 elems[8], '', '', '', '', elems[9], elems[-2],
+                                 datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M").isoformat(), elems[-6],
+                                 elems[-4], '', '', '', '', elems[-3], elems[-2],
                                  str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M").year - int(elems[-1])) if elems[-1] else ''])
             else:
                 return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M:%S").isoformat(),
-                                 datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M:%S").isoformat(), elems[6],
-                                 elems[8], '', '', '', '', elems[9], elems[-2],
+                                 datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M:%S").isoformat(), elems[-6],
+                                 elems[-4], '', '', '', '', elems[-3], elems[-2],
                                  str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M:%S").year - int(elems[-1])) if elems[-1] else ''])
         else:
             return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").isoformat(),
-                             datetime.datetime.strptime(elems[2], "%m/%d/%Y %H:%M").isoformat(), elems[6],
-                             elems[8], '', '', '', '', elems[9], elems[-2],
+                             datetime.datetime.strptime(elems[2], "%m/%d/%Y %H:%M").isoformat(), elems[-6],
+                             elems[-4], '', '', '', '', elems[-3], elems[-2],
                              str(datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").year - int(elems[-1])) if elems[-1] else ''])
     except:
         return ''
