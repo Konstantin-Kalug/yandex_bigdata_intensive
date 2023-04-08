@@ -2,7 +2,6 @@ from pyspark import SparkConf, SparkContext
 import datetime
 import shutil
 
-shutil.rmtree("clean_sources", ignore_errors=True)
 def parse_stations(line):
     id_, name, latitude, longitude, dpcapacity, landmark, online_date = line.strip().split(",")
     if id_ != "id":
