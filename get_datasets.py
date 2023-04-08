@@ -51,7 +51,7 @@ def map_2020_2023(elems):
         return ','.join([elems[0], elems[1], datetime.datetime.strptime(elems[2], "%Y-%m-%d %H:%M:%S").isoformat(),
                          datetime.datetime.strptime(elems[3], "%Y-%m-%d %H:%M:%S").isoformat(),
                          elems[4], elems[6], elems[8], elems[9],
-                         elems[10], '', ''])
+                         elems[10], elems[11], elems[12], '', ''])
      except:
          return ''
 
