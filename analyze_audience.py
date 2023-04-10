@@ -40,12 +40,24 @@ age_time = df[['age', 'starttime', 'endtime']]
 age_time['starttime'] = pd.to_datetime(age_time['starttime'])
 age_time['endtime'] = pd.to_datetime(age_time['endtime'])
 age_time['duration'] = round((age_time['endtime'] - age_time['starttime']).dt.seconds / 60)
-age_time = age_time[['age', 'duration']]
+age_time2 = age_time[['age', 'duration']]
 
-age_bins = pd.cut(age_time['age'],
-                  [0, 15, 18, 21, 24, 27, 30, 35, 40, 45, 50, 55, 60, 70, 90, age_time['age'].max()],
+age_bins = pd.cut(age_time2['age'],
+                  [0, 15, 18, 21, 24, 27, 30, 35, 40, 45, 50, 55, 60, 70, 90, age_time2['age'].max()],
                   include_lowest=True)
+age_time2['age_bins'] = age_bins
+"""age_time2 = age_time2.dropna().groupby('age_bins')['duration'].mean()
+age_time2.plot()
+plt.show()"""
+
+plt.figure(figsize=(10, 5))
+age_bins = pd.cut(age_time['age'],
+                  [0, 15, 18, 21, 24, 27, 30, 35, 40, 45, 50, 55, 60, 70, 90, 150, age_time['age'].max()],
+                  include_lowest=True)
+age_time['starttime'] = age_time['starttime'].dt.hour
 age_time['age_bins'] = age_bins
-age_time = age_time.dropna().groupby('age_bins')['duration'].mean()
+age_time = age_time[['age_bins', 'starttime']]
+age_time = age_time.dropna().groupby('age_bins')['starttime'].mean()
+plt.ylabel('Время начала поездки, в часах суток')
 age_time.plot()
 plt.show()
