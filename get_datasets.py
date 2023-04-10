@@ -183,7 +183,7 @@ def bind_data():
 
 
 def unity():
-    os.mkdir('data/src')
+    os.makedirs('data/src')
     for i in range(2013, 2020):
         os.rename(f'binded_data/{i}', f'data/src/{i}')
     for i in range(2020, 2024):
