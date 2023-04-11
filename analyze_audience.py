@@ -1,3 +1,5 @@
+import sys
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -80,7 +82,7 @@ age_male.plot()
 age_female.plot()
 plt.legend(['Мужчины', 'Женщины'])
 # plt.show()
-"""
+
 stations = df[['startstation', 'id']]
 stations['startstation'] = stations['startstation'].dropna()
 stations = stations.groupby('startstation').count().sort_values(by='id', ascending=False)
@@ -99,5 +101,55 @@ for i in range(FIRST_N):
 df2 = pd.DataFrame(data).set_index('station')
 plt.figure(figsize=(20, 5))
 plt.plot(df2)
-plt.show()
+# plt.show()
+"""
+age_id = df[['age', 'id']]
+age_id = age_id.dropna().groupby('age').count()
+a = age_id.axes[0].values
+# plt.scatter(a, age_id)
+# plt.show()
 
+from pyspark import SparkConf, SparkContext
+
+
+def parse(line):
+    info = line.split(',')
+    # float(info[-2]) - возраст
+    # float(info[-3]) - пол
+    return [((info[-3], info[-2]), 1)]
+
+
+conf = SparkConf().setAppName('test').setMaster('local')
+sc = SparkContext(conf=conf)
+df0 = sc.textFile(f'data/src/{2013}/part-00000')
+for i in range(2014, 2020):
+    df0 = df0.union(sc.textFile(f'data/src/{i}/part-00000'))
+
+df0 = df0.flatMap(parse).filter(lambda tup: tup[0][0] != '' and tup[0][1] != '').\
+    map(lambda tup: ((tup[0][0], float(tup[0][1])), 1)).reduceByKey(lambda v1, v2: v1 + v2)\
+    .collect()
+summ = 0
+for i in df0:
+    summ += i[1]
+
+data = {'Gender': [], 'Age': [], 'Num': []}
+for i in df0:
+    perc = round(i[1] / summ * 100, 1)
+    if perc > 0:
+        data['Gender'].append(i[0][0])
+        data['Age'].append(i[0][1])
+        data['Num'].append(perc)
+
+"""from pprint import pprint
+pprint(data)
+print(summ)"""
+plt.figure(figsize=(10, 5))
+plt.ylabel('% польз. возраста от всех польз.')
+df3 = pd.DataFrame(data)
+df3_male = df3[df3['Gender'] == 'Male']
+df3_female = df3[df3['Gender'] == 'Female']
+df3_male = df3_male.groupby('Age')['Num'].sum()
+df3_female = df3_female.groupby('Age')['Num'].sum()
+df3_female.plot()
+df3_male.plot()
+plt.show()
