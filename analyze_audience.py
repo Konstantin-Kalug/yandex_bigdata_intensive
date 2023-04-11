@@ -102,7 +102,7 @@ df2 = pd.DataFrame(data).set_index('station')
 plt.figure(figsize=(20, 5))
 plt.plot(df2)
 # plt.show()
-"""
+
 age_id = df[['age', 'id']]
 age_id = age_id.dropna().groupby('age').count()
 a = age_id.axes[0].values
@@ -140,9 +140,9 @@ for i in df0:
         data['Age'].append(i[0][1])
         data['Num'].append(perc)
 
-"""from pprint import pprint
+from pprint import pprint
 pprint(data)
-print(summ)"""
+print(summ)
 plt.figure(figsize=(10, 5))
 plt.ylabel('% польз. возраста от всех польз.')
 df3 = pd.DataFrame(data)
@@ -152,4 +152,53 @@ df3_male = df3_male.groupby('Age')['Num'].sum()
 df3_female = df3_female.groupby('Age')['Num'].sum()
 df3_female.plot()
 df3_male.plot()
-plt.show()
+# plt.show()
+"""
+import numpy as np
+"""
+srednee_dur = []
+for i in range(2013, 2024):
+    df = pd.read_table(f'data/src/{i}/part-00000', index_col=False, header=None,
+                       names=['id', 'biketype', 'starttime', 'endtime', 'startstation',
+                              'endstation',
+                              'startlat', 'startlng', 'endlat', 'endlng', 'member_casual', 'gender',
+                              'age',
+                              'bikeid'], sep=',')
+    df = df[['endtime', 'starttime', 'age']]
+    df['age_bins'] = pd.cut(df['age'],
+                  [0, 15, 18, 21, 24, 27, 30, 35, 40, 45, 50, 55, 60, 70, 90, 150],
+                  include_lowest=True)
+    df['starttime'] = pd.to_datetime(df['starttime'])
+    df['endtime'] = pd.to_datetime(df['endtime'])
+    df['duration'] = round((df['endtime'] - df['starttime']).dt.seconds / 60)
+    print(df)
+    df = df.dropna().groupby('age_bins')['duration'].mean()
+    df_durs = df.values
+    df_durs = df_durs[~np.isnan(df_durs)]
+    srednee_dur.append(df_durs.sum() / len(df_durs))
+    df.plot()
+#plt.show()
+#plt.legend([f'{i}' for i in range(2013, 2020)])
+plt.xlabel('Год')
+plt.ylabel('Средняя продолжительность поездок в мин.')
+plt.plot(range(2013, 2024), srednee_dur)
+#plt.show()
+"""
+from pyspark import SparkConf, SparkContext
+from datetime import datetime, timedelta
+
+
+def parse2(line):
+    info = line.split(',')
+    dur = (datetime.fromisoformat(info[3]) - datetime.fromisoformat(info[2])).seconds / 60
+    return [(dur, {'id': int(info[0]), 'starttime': info[2], 'endtime': info[3], 'gender': info[-3],
+             'age': info[-2], 'duration': dur})]
+
+
+conf = SparkConf().setAppName('test').setMaster('local')
+sc = SparkContext(conf=conf)
+df0 = sc.textFile(f'data/src/{2013}/part-00000')
+for i in range(2014, 2020):
+    df0 = df0.union(sc.textFile(f'data/src/{i}/part-00000'))
+df0 = df0.flatMap(parse2).sortByKey(ascending=False).top(10)
+print(df0)
