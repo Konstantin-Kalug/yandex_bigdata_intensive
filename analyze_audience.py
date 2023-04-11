@@ -54,7 +54,7 @@ plt.figure(figsize=(10, 5))
 age_bins = pd.cut(age_time['age'],
                   [0, 15, 18, 21, 24, 27, 30, 35, 40, 45, 50, 55, 60, 70, 90, 150, age_time['age'].max()],
                   include_lowest=True)
-age_time['starttime'] = age_time['starttime'].dt.hour
+age_time['starttime'] = age_time['starttime'].dt.hour + age_time['starttime'].dt.minute / 60
 age_time['age_bins'] = age_bins
 age_time = age_time[['age_bins', 'starttime']]
 age_time = age_time.dropna().groupby('age_bins')['starttime'].mean()
