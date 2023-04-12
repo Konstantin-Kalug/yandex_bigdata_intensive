@@ -183,7 +183,7 @@ plt.xlabel('Год')
 plt.ylabel('Средняя продолжительность поездок в мин.')
 plt.plot(range(2013, 2024), srednee_dur)
 #plt.show()
-"""
+
 from pyspark import SparkConf, SparkContext
 from datetime import datetime, timedelta
 
@@ -202,3 +202,48 @@ for i in range(2014, 2020):
     df0 = df0.union(sc.textFile(f'data/src/{i}/part-00000'))
 df0 = df0.flatMap(parse2).sortByKey(ascending=False).top(10)
 print(df0)
+
+sredniy_age = []
+for i in range(2013, 2024):
+    df = pd.read_table(f'data/src/{i}/part-00000', index_col=False, header=None,
+                       names=['id', 'biketype', 'starttime', 'endtime', 'startstation',
+                              'endstation',
+                              'startlat', 'startlng', 'endlat', 'endlng', 'member_casual', 'gender',
+                              'age',
+                              'bikeid'], sep=',')
+    df = df[['age']]
+    sredniy_age.append(df['age'].mean())
+plt.plot(range(2013, 2024), sredniy_age)
+plt.show()
+"""
+
+from pyspark import SparkConf, SparkContext
+
+conf = SparkConf().setAppName('test').setMaster('local')
+sc = SparkContext(conf=conf)
+
+for i in range(2013, 2020):
+    df0 = sc.textFile(f'data/src/{i}/part-00000')
+    df0 = df0.flatMap(parse).filter(lambda tup: tup[0][0] != '' and tup[0][1] != '').\
+        map(lambda tup: (float(tup[0][1]), 1)).reduceByKey(lambda v1, v2: v1 + v2)\
+        .collect()
+    summ = 0
+    for i in df0:
+        summ += i[1]
+
+    data = {'Age': [], 'Num': []}
+    for i in df0:
+        perc = round(i[1] / summ * 100, 1)
+        if perc > 0:
+            data['Age'].append(i[0])
+            data['Num'].append(perc)
+
+    from pprint import pprint
+    pprint(data)
+    print(summ)
+    plt.figure(figsize=(10, 5))
+    plt.ylabel('% польз. возраста от всех польз.')
+    df3 = pd.DataFrame(data).groupby('Age')['Num'].sum()
+    df3.plot()
+plt.legend([f'{i}' for i in range(2013, 2020)])
+plt.show()
