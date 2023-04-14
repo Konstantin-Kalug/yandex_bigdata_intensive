@@ -39,7 +39,13 @@ def map_2013_2019(elems):
                                  elems[-4], '', '', '', '', elems[-3], elems[-2],
                                  str(datetime.datetime.strptime(elems[1], "%Y-%m-%d %H:%M:%S").year - int(elems[-1])) if elems[-1] else '', elems[3]])
         else:
-            return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").isoformat(),
+            if elems[1][-3] == ':' and elems[1][-6] == ':':
+                return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M:%S").isoformat(),
+                                 datetime.datetime.strptime(elems[2], "%m/%d/%Y %H:%M:%S").isoformat(), elems[-6],
+                                 elems[-4], '', '', '', '', elems[-3], elems[-2],
+                                 str(datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M:%S").year - int(elems[-1])) if elems[-1] else '', elems[3]])
+            else:
+                return ','.join([elems[0], '', datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").isoformat(),
                              datetime.datetime.strptime(elems[2], "%m/%d/%Y %H:%M").isoformat(), elems[-6],
                              elems[-4], '', '', '', '', elems[-3], elems[-2],
                              str(datetime.datetime.strptime(elems[1], "%m/%d/%Y %H:%M").year - int(elems[-1])) if elems[-1] else '', elems[3]])
@@ -167,7 +173,7 @@ def bind_data():
                                       .reduceByKey(lambda a, b: a) \
                                       .map(mapper_st_final)
     stations_key = stations.keyBy(lambda x: x["name"])
-    for y in range(2013, 2019 + 1):
+    for y in range(2013, 2020):
         try:
             df = sc.textFile(f"clean_sources/{y}").map(mapper_tr)
             df_from = df.keyBy(lambda x: x["start_name"])
